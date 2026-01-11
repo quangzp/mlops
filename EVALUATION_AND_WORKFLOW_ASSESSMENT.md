@@ -173,7 +173,7 @@ evaluate-model:
     - name: Run evaluation
       run: python mlops/modeling/evaluate.py
     - name: Upload evaluation results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: evaluation-results
         path: reports/
@@ -202,7 +202,7 @@ strategy:
 Không lưu test reports, coverage reports → Nên upload:
 ```yaml
 - name: Upload test results
-  uses: actions/upload-artifact@v3
+  uses: actions/upload-artifact@v4
   if: always()
   with:
     name: test-results
