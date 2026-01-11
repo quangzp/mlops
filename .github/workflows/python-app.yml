@@ -112,7 +112,7 @@ jobs:
 
       # Upload evaluation artifacts
       - name: Upload evaluation metrics
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: evaluation-metrics
           path: |
@@ -121,7 +121,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload sample images
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: evaluation-samples
           path: reports/samples/
