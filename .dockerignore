@@ -1,0 +1,50 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+.venv/
+venv/
+ENV/
+
+# Ignore git and version control
+.git/
+.gitignore
+
+# Ignore DVC cache and data outputs
+.dvc/
+*.dvc
+.cache/
+
+# Ignore Jupyter and notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore test outputs and coverage
+htmlcov/
+.coverage
+*.cover
+
+# Ignore build and dist folders
+dist/
+build/
+*.egg-info/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore MLflow and DVC experiment folders
+mlruns/
+
+# Ignore reports and figures
+reports/
+
+# Ignore data (optional, if you don't want to copy raw/processed data)
+data/
+
+mlops/download_and_prepare_data.py

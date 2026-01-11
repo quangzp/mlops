@@ -158,6 +158,9 @@ graph TD
         H -->|WandB Log| I(WandB Dashboard)
         H -->|DVC Push| D
     end
+    subgraph Monitoring [Monitoring]
+        K[Prometheus + Grafana] --> G[VPS]
+    end
 
     subgraph Versioning
         G -->|Git Push .dvc| B
