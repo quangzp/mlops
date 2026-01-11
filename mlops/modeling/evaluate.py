@@ -12,30 +12,25 @@ It generates sample predictions and saves evaluation metrics.
 
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import hydra
-import mlflow
-import numpy as np
-import torch
-import torch.nn.functional as F
 from hydra.utils import get_original_cwd
 from loguru import logger
+import mlflow
+import numpy as np
 from omegaconf import DictConfig
 from PIL import Image
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
-from torchvision import transforms
+import torch
+import torch.nn.functional as F
 from tqdm import tqdm
 
-from mlops.src.components.discriminator import define_D
 from mlops.src.components.generator import define_G
 from mlops.src.models.pix2pixhd_module import Pix2PixHDDataset
 
 
-def calculate_metrics(
-    real_images: torch.Tensor, fake_images: torch.Tensor
-) -> Dict[str, float]:
+def calculate_metrics(real_images: torch.Tensor, fake_images: torch.Tensor) -> dict[str, float]:
     """
     Calculate evaluation metrics between real and generated images.
 
@@ -60,13 +55,7 @@ def calculate_metrics(
         fake_img = np.transpose(fake_np[i], (1, 2, 0))
 
         # Calculate SSIM
-        ssim_score = ssim(
-            real_img,
-            fake_img,
-            data_range=1.0,
-            channel_axis=2,
-            win_size=11
-        )
+        ssim_score = ssim(real_img, fake_img, data_range=1.0, channel_axis=2, win_size=11)
         ssim_scores.append(ssim_score)
 
         # Calculate PSNR
@@ -125,7 +114,7 @@ def save_sample_images(
     width = sketch_img.width
     height = sketch_img.height
 
-    comparison = Image.new('RGB', (width * 3, height))
+    comparison = Image.new("RGB", (width * 3, height))
     comparison.paste(sketch_img, (0, 0))
     comparison.paste(real_img, (width, 0))
     comparison.paste(fake_img, (width * 2, 0))
@@ -220,15 +209,10 @@ def main(cfg: DictConfig):
         # Create train/test split (same as training)
         train_size = int(0.8 * len(dataset))
         test_size = len(dataset) - train_size
-        _, test_ds = torch.utils.data.random_split(
-            dataset, [train_size, test_size]
-        )
+        _, test_ds = torch.utils.data.random_split(dataset, [train_size, test_size])
 
         test_loader = torch.utils.data.DataLoader(
-            test_ds,
-            batch_size=batch_size,
-            num_workers=num_workers,
-            shuffle=False
+            test_ds, batch_size=batch_size, num_workers=num_workers, shuffle=False
         )
 
         logger.info(f"Test size: {len(test_ds)}")
@@ -289,9 +273,7 @@ def main(cfg: DictConfig):
 
                 # Save sample images
                 if idx < num_samples:
-                    save_sample_images(
-                        sketch, real_image, fake_image, sample_dir, idx
-                    )
+                    save_sample_images(sketch, real_image, fake_image, sample_dir, idx)
 
         # ---- Aggregate metrics ----
         logger.info("Aggregating metrics...")
@@ -311,7 +293,9 @@ def main(cfg: DictConfig):
         logger.info("=" * 80)
         logger.info(f"SSIM: {final_metrics['ssim_mean']:.4f} ± {final_metrics['ssim_std']:.4f}")
         logger.info(f"PSNR: {final_metrics['psnr_mean']:.2f} ± {final_metrics['psnr_std']:.2f} dB")
-        logger.info(f"L1 Loss: {final_metrics['l1_loss_mean']:.4f} ± {final_metrics['l1_loss_std']:.4f}")
+        logger.info(
+            f"L1 Loss: {final_metrics['l1_loss_mean']:.4f} ± {final_metrics['l1_loss_std']:.4f}"
+        )
         logger.info("=" * 80)
 
         # ---- Save metrics ----
