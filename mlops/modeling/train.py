@@ -21,13 +21,35 @@ def main(cfg: DictConfig):
     # ---- Dataset paths ----
     # Get project root - handle both running from root and from subdirectories
     original_cwd = Path(get_original_cwd())
-    # If we're in a subdirectory, go up to project root
-    if (original_cwd / "mlops").exists() and (original_cwd / "data").exists():
+
+    # Find project root by going up the directory tree
+    # Project root should have both "data/" and "mlops/" directories
+    current_path = original_cwd
+    project_root = None
+
+    # Go up max 5 levels to find project root
+    for _ in range(5):
+        if (
+            (current_path / "data").exists()
+            and (current_path / "mlops").exists()
+            and (
+                (current_path / "pyproject.toml").exists()
+                or (current_path / "requirements.txt").exists()
+            )
+        ):
+            project_root = current_path
+            break
+        if current_path == current_path.parent:  # Reached filesystem root
+            break
+        current_path = current_path.parent
+
+    # Fallback: use original_cwd if not found
+    if project_root is None:
         project_root = original_cwd
-    elif (original_cwd.parent / "mlops").exists() and (original_cwd.parent / "data").exists():
-        project_root = original_cwd.parent
-    else:
-        project_root = original_cwd
+        logger.warning(
+            f"Could not detect project root. Using: {project_root}\n"
+            f"Please ensure you're running from project root or a subdirectory."
+        )
 
     logger.info(f"Project root: {project_root}")
     logger.info(f"Original CWD: {original_cwd}")
@@ -44,12 +66,8 @@ def main(cfg: DictConfig):
     ngf = cfg.model.generator.ngf
     n_downsample_global: int = cfg.model.generator.n_downsampling
     n_blocks_global: int = cfg.model.generator.n_blocks
-    n_local_enhancers: int = cfg.model.generator.get(
-        "n_local_enhancers", 1
-    )  # hoặc giá trị mặc định nếu không có
-    n_blocks_local: int = cfg.model.generator.get(
-        "n_blocks_local", 3
-    )  # hoặc giá trị mặc định nếu không có
+    n_local_enhancers: int = cfg.model.generator.get("n_local_enhancers", 1)
+    n_blocks_local: int = cfg.model.generator.get("n_blocks_local", 3)
     # ---- Discriminator config ----
     ndf = cfg.model.discriminator_channels
     n_layers_D: int = cfg.model.discriminator.n_layers
@@ -241,7 +259,14 @@ def main(cfg: DictConfig):
 
         # ---- Training loop ----
         # 1. Setup MLflow
+        # Set MLflow tracking URI to project root
+        mlruns_dir = project_root / "mlruns"
+        mlruns_dir.mkdir(exist_ok=True)
+        mlflow.set_tracking_uri(str(mlruns_dir))
+        logger.info(f"MLflow tracking URI: {mlflow.get_tracking_uri()}")
+
         mlflow.set_experiment(cfg.experiment.name)
+        logger.info(f"MLflow experiment: {cfg.experiment.name}")
 
         # 2. Setup WandB
         # wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
