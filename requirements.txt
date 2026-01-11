@@ -48,4 +48,7 @@ pre-commit==3.6.0
 loguru>=0.6.0
 
 
+fastapi
+uvicorn
+
 # -e .

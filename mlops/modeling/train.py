@@ -19,7 +19,41 @@ from mlops.src.models.pix2pixhd_module import Pix2PixHD, Pix2PixHDDataset
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
     # ---- Dataset paths ----
-    project_root = Path(get_original_cwd())
+    # Get project root - handle both running from root and from subdirectories
+    original_cwd = Path(get_original_cwd())
+
+    # Find project root by going up the directory tree
+    # Project root should have both "data/" and "mlops/" directories
+    current_path = original_cwd
+    project_root = None
+
+    # Go up max 5 levels to find project root
+    for _ in range(5):
+        if (
+            (current_path / "data").exists()
+            and (current_path / "mlops").exists()
+            and (
+                (current_path / "pyproject.toml").exists()
+                or (current_path / "requirements.txt").exists()
+            )
+        ):
+            project_root = current_path
+            break
+        if current_path == current_path.parent:  # Reached filesystem root
+            break
+        current_path = current_path.parent
+
+    # Fallback: use original_cwd if not found
+    if project_root is None:
+        project_root = original_cwd
+        logger.warning(
+            f"Could not detect project root. Using: {project_root}\n"
+            f"Please ensure you're running from project root or a subdirectory."
+        )
+
+    logger.info(f"Project root: {project_root}")
+    logger.info(f"Original CWD: {original_cwd}")
+
     dataset_path = project_root / cfg.paths.raw
     feature_folder = str(project_root / cfg.dataset.processed_sketch_dir)
     label_folder = str(project_root / cfg.dataset.processed_image_dir)
@@ -32,12 +66,8 @@ def main(cfg: DictConfig):
     ngf = cfg.model.generator.ngf
     n_downsample_global: int = cfg.model.generator.n_downsampling
     n_blocks_global: int = cfg.model.generator.n_blocks
-    n_local_enhancers: int = cfg.model.generator.get(
-        "n_local_enhancers", 1
-    )  # hoặc giá trị mặc định nếu không có
-    n_blocks_local: int = cfg.model.generator.get(
-        "n_blocks_local", 3
-    )  # hoặc giá trị mặc định nếu không có
+    n_local_enhancers: int = cfg.model.generator.get("n_local_enhancers", 1)
+    n_blocks_local: int = cfg.model.generator.get("n_blocks_local", 3)
     # ---- Discriminator config ----
     ndf = cfg.model.discriminator_channels
     n_layers_D: int = cfg.model.discriminator.n_layers
@@ -83,6 +113,45 @@ def main(cfg: DictConfig):
         logger.info(f"Images directory: {images_dir}")
         logger.info(f"Feature folder: {feature_folder}")
         logger.info(f"Label folder: {label_folder}")
+
+        # Validate paths exist
+        images_dir_path = Path(images_dir)
+        sketches_dir = images_dir_path / "sketches"
+        images_dir_check = images_dir_path / "images"
+
+        if not images_dir_path.exists():
+            raise FileNotFoundError(
+                f"Images directory does not exist: {images_dir_path}\n"
+                f"Please ensure data is processed and available at this path."
+            )
+        if not sketches_dir.exists():
+            raise FileNotFoundError(
+                f"Sketches directory does not exist: {sketches_dir}\n"
+                f"Please run data processing script first."
+            )
+        if not images_dir_check.exists():
+            raise FileNotFoundError(
+                f"Images directory does not exist: {images_dir_check}\n"
+                f"Please run data processing script first."
+            )
+
+        # Check for image files
+        sketch_files = list(sketches_dir.glob("*.jpg"))
+        image_files = list(images_dir_check.glob("*.jpg"))
+
+        logger.info(f"Found {len(sketch_files)} sketch files and {len(image_files)} image files")
+
+        if len(sketch_files) == 0:
+            raise ValueError(
+                f"No .jpg files found in {sketches_dir}\n"
+                f"Please ensure data processing has been completed."
+            )
+        if len(image_files) == 0:
+            raise ValueError(
+                f"No .jpg files found in {images_dir_check}\n"
+                f"Please ensure data processing has been completed."
+            )
+
         train_dataset = Pix2PixHDDataset(
             images_dir=images_dir,
             feature_fold="sketches/",
@@ -91,7 +160,20 @@ def main(cfg: DictConfig):
         )
         logger.info(f"Dataset size: {len(train_dataset)}")
 
+        if len(train_dataset) == 0:
+            raise ValueError(
+                "Dataset is empty! Please check:\n"
+                f"1. Data exists in {sketches_dir}\n"
+                f"2. File naming matches between sketches and images\n"
+                f"3. Files are .jpg format"
+            )
+
         # Create train/test split
+        if len(train_dataset) < 2:
+            raise ValueError(
+                f"Dataset too small ({len(train_dataset)} samples). Need at least 2 samples for train/test split."
+            )
+
         train_size = int(0.8 * len(train_dataset))
         test_size = len(train_dataset) - train_size
         train_ds, test_ds = torch.utils.data.random_split(train_dataset, [train_size, test_size])
@@ -177,7 +259,14 @@ def main(cfg: DictConfig):
 
         # ---- Training loop ----
         # 1. Setup MLflow
+        # Set MLflow tracking URI to project root
+        mlruns_dir = project_root / "mlruns"
+        mlruns_dir.mkdir(exist_ok=True)
+        mlflow.set_tracking_uri(str(mlruns_dir))
+        logger.info(f"MLflow tracking URI: {mlflow.get_tracking_uri()}")
+
         mlflow.set_experiment(cfg.experiment.name)
+        logger.info(f"MLflow experiment: {cfg.experiment.name}")
 
         # 2. Setup WandB
         # wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)

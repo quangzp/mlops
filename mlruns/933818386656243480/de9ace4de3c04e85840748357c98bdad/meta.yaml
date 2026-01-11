@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlruns/933818386656243480/de9ace4de3c04e85840748357c98bdad/artifacts
+end_time: 1766902741713
+entry_point_name: ''
+experiment_id: '933818386656243480'
+lifecycle_stage: active
+run_id: de9ace4de3c04e85840748357c98bdad
+run_name: marvelous-shoat-248
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766902698937
+status: 4
+tags: []
+user_id: manhnguyen

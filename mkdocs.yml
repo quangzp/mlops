@@ -1,0 +1,52 @@
+site_name: MLOps Pix2PixHD Project
+site_author: Nhom11
+site_description: End-to-end MLOps pipeline for Pix2PixHD image-to-image translation
+
+theme:
+  name: material
+  language: en
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Project Structure: project_structure.md
+  - Configuration: configuration.md
+  - Data Pipeline:
+      - Data Overview: data_overview.md
+      - Dataset Preparation: dataset_preparation.md
+      - DataLoader & Augmentation: dataloader_augmentation.md
+  - Model:
+      - Model Architecture: model_architecture.md
+      - Generator: generator.md
+      - Discriminator: discriminator.md
+      - Loss Functions: loss_functions.md
+  - Training:
+      - Training Script: training.md
+      - Checkpointing: checkpointing.md
+      - Logging & Monitoring: logging_monitoring.md
+  - Experiment Tracking:
+      - MLflow: mlflow.md
+      - Weights & Biases: wandb.md
+  - Deployment: deployment.md
+  - Development:
+      - Testing & Linting: dev_tools.md
+      - Requirements: requirements.md
+      - Troubleshooting: troubleshooting.md
+  - API Reference: api_reference.md
+  - Changelog: changelog.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - tables
+  - footnotes
+
+repo_url: https://github.com/quangzp/pix2pix-mlops
+repo_name: pix2pix-mlops
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/quangzp/pix2pix-mlops

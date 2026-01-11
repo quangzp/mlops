@@ -1,0 +1,224 @@
+wandb_version: 1
+
+project_name:
+  desc: null
+  value: sketch2image-mlops
+version:
+  desc: null
+  value: 0.1.0
+seed:
+  desc: null
+  value: 42
+experiment:
+  desc: null
+  value:
+    name: pix2pixhd_baseline
+    tags:
+    - sketch2image
+    - pix2pix
+    - gan
+    tracking: mlflow
+    log_model: true
+logging:
+  desc: null
+  value:
+    level: INFO
+    log_dir: logs
+    log_images_every_n_epochs: 1
+    log_gradients: false
+device:
+  desc: null
+  value: mps
+num_workers:
+  desc: null
+  value: 4
+pin_memory:
+  desc: null
+  value: true
+output_dir:
+  desc: null
+  value: outputs
+checkpoint_dir:
+  desc: null
+  value: models/checkpoints
+logger:
+  desc: null
+  value:
+    wandb:
+      entity: quangng9112ad-hanoi-university-of-science-and-technology
+      project: MLOps
+      group: experiment-1
+      name: null
+paths:
+  desc: null
+  value:
+    raw: data/raw/original
+    processed: data/processed
+    interim: data/interim
+    models: models
+    checkpoints: models/checkpoints
+    saved: models/saved
+    logs: logs
+    reports: reports
+    figures: reports/figures
+    root: .
+    external: data/external
+dataset:
+  desc: null
+  value:
+    name: sketch2image
+    raw_dir: data/raw/original
+    processed_sketch_dir: data/processed/sketches
+    processed_image_dir: data/processed/images
+    image_size: 256
+    sketch_ext: .jpg
+    image_ext: .jpg
+    resize: 256
+    clean_processed: true
+    batch_size: 4
+    num_workers: 4
+    pin_memory: true
+    train_split: 0.8
+    val_split: 0.1
+    test_split: 0.1
+    augmentation:
+      enable: true
+      horizontal_flip: 0.5
+      rotation: 15
+      brightness: 0.2
+      contrast: 0.2
+model:
+  desc: null
+  value:
+    name: pix2pix
+    type: gan
+    generator_channels: 64
+    discriminator_channels: 64
+    generator:
+      name: unet
+      ngf: 64
+      n_downsampling: 3
+      n_blocks: 9
+      norm_layer: instance
+      use_dropout: false
+    discriminator:
+      name: patchgan
+      ndf: 64
+      ngf: 64
+      n_layers: 3
+      num_D: 2
+      norm_layer: instance
+    loss_weights:
+      gan: 1.0
+      l1: 100.0
+      perceptual: 10.0
+training:
+  desc: null
+  value:
+    num_epochs: 100
+    batch_size: 16
+    learning_rate: 0.0002
+    device: mps
+    save_every: 5
+    accumulate_grad_batches: 1
+    lambda_feat: 10.0
+    replay_pool_size: 10000
+    resume_from: null
+    optimizer:
+      name: adam
+      lr: 0.0002
+      betas:
+      - 0.5
+      - 0.999
+      weight_decay: 0.0
+    scheduler:
+      name: linear
+      warmup_epochs: 5
+      min_lr: 1.0e-05
+    gradient_clip_val: 1.0
+    precision: 32
+    fast_dev_run: false
+    overfit_batches: 0.0
+    val_check_interval: 1.0
+    check_val_every_n_epoch: 1
+    log_every_n_steps: 50
+    early_stopping:
+      monitor: val/loss
+      patience: 10
+      mode: min
+    checkpoint:
+      monitor: val/loss
+      mode: min
+      save_top_k: 3
+      save_last: true
+params:
+  desc: null
+  value:
+    metrics:
+    - name: fid
+      description: Frechet Inception Distance
+    - name: ssim
+      description: Structural Similarity Index
+    - name: psnr
+      description: Peak Signal-to-Noise Ratio
+    - name: lpips
+      description: Learned Perceptual Image Patch Similarity
+    - name: l1_loss
+      description: L1 Loss
+    - name: gan_loss
+      description: GAN Loss
+    - name: perceptual_loss
+      description: Perceptual Loss
+    hyperparameters:
+      learning_rate:
+      - 0.0001
+      - 0.0002
+      - 0.0004
+      batch_size:
+      - 4
+      - 8
+      - 16
+      ngf:
+      - 32
+      - 64
+      - 128
+      ndf:
+      - 32
+      - 64
+      - 128
+_wandb:
+  desc: null
+  value:
+    python_version: 3.9.6
+    cli_version: 0.16.6
+    framework: lightning
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1766902697.0
+    t:
+      1:
+      - 1
+      - 9
+      - 41
+      - 50
+      - 55
+      - 103
+      - 105
+      2:
+      - 1
+      - 9
+      - 41
+      - 50
+      - 55
+      - 103
+      - 105
+      3:
+      - 2
+      - 16
+      - 23
+      4: 3.9.6
+      5: 0.16.6
+      8:
+      - 4
+      - 5
+      13: darwin-arm64

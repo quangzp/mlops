@@ -49,3 +49,6 @@ loguru>=0.6.0
 
 # kaggle
 kagglehub
+
+fastapi
+uvicorn

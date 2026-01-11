@@ -31,10 +31,32 @@ class Pix2PixHDDataset(torch.utils.data.Dataset):
             [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
         )
         self.imagesDir = images_dir
-        self.images = glob(os.path.join(images_dir, feature_fold, "*.jpg"))
         self.feature_fold = feature_fold
         self.label_fold = label_fold
         self.img_size = img_size
+
+        # Build search path
+        search_path = os.path.join(images_dir, feature_fold, "*.jpg")
+        # Also try without trailing slash
+        if not os.path.exists(os.path.dirname(search_path)):
+            search_path_alt = os.path.join(images_dir, feature_fold.rstrip("/"), "*.jpg")
+            if os.path.exists(os.path.dirname(search_path_alt)):
+                search_path = search_path_alt
+
+        self.images = glob(search_path)
+
+        # Debug logging
+        if len(self.images) == 0:
+            print(f"WARNING: No images found at: {search_path}")
+            print(f"Images dir exists: {os.path.exists(images_dir)}")
+            if os.path.exists(images_dir):
+                print(f"Contents of {images_dir}: {os.listdir(images_dir)}")
+            feature_dir = os.path.join(images_dir, feature_fold)
+            print(f"Feature dir exists: {os.path.exists(feature_dir)}")
+            if os.path.exists(feature_dir):
+                print(f"Contents of {feature_dir}: {os.listdir(feature_dir)[:10]}")
+        else:
+            print(f"Found {len(self.images)} images in {search_path}")
 
     def __getitem__(self, idx):
         f_name = self.images[idx]
