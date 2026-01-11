@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlops/modeling/mlruns/125069575813279498/2f766792e7af48989a73bda792df0c38/artifacts
+end_time: 1767949110615
+entry_point_name: ''
+experiment_id: '125069575813279498'
+lifecycle_stage: active
+run_id: 2f766792e7af48989a73bda792df0c38
+run_name: hilarious-lamb-346
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767948593631
+status: 3
+tags: []
+user_id: manhnguyen

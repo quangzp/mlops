@@ -123,7 +123,19 @@ python src/train.py train.max_epochs=200 data.batch_size=4
 python src/train.py logger=wandb
 ```
 
-### 4. Suy luận (Inference)
+### 4. Đánh giá Model (Evaluation)
+Đánh giá chất lượng model trên test set:
+```bash
+# Chạy evaluation với metrics (SSIM, PSNR, L1 Loss)
+python mlops/modeling/evaluate.py
+
+# Xem kết quả
+cat reports/evaluation_metrics.json
+```
+
+📖 **Chi tiết**: Xem [Evaluation Documentation](docs/evaluation.md) để hiểu về metrics và quy trình đánh giá.
+
+### 5. Suy luận (Inference)
 Sinh ảnh từ model đã train:
 ```bash
 python src/predict.py \
@@ -147,7 +159,9 @@ graph TD
 
     subgraph CI_CD [GitHub Actions]
         B -->|Pull Request| E{Chạy Test}
-        E -->|Pass| F[Merge vào Main]
+        E -->|Pass| E2{Model Evaluation}
+        E2 -->|Quality Pass| F[Merge vào Main]
+        E2 -->|Quality Fail| A
         E -->|Fail| A
     end
 
@@ -166,6 +180,64 @@ graph TD
         G -->|Git Push .dvc| B
     end
 ```
+
+## 🔍 Chi tiết MLOps Pipeline
+
+Pipeline CI/CD bao gồm các giai đoạn sau:
+
+### 1️⃣ **CI - Continuous Integration**
+
+#### a) Code Quality Check
+- **Linting**: Ruff kiểm tra code style và potential bugs
+- **Formatting**: Kiểm tra code format consistency
+- **Type Checking**: Validate type hints (nếu có)
+
+#### b) Unit Tests
+- Pytest chạy tất cả unit tests
+- Coverage report để đảm bảo code coverage
+- Các tests bao gồm: data loading, model initialization, config validation
+
+#### c) Model Evaluation ⭐ **NEW**
+- **Load Dataset**: Pull dữ liệu test từ DVC/Git LFS
+- **Model Inference**: Chạy model trên test set
+- **Metrics Calculation**:
+  - SSIM (Structural Similarity) - đo độ tương đồng cấu trúc
+  - PSNR (Peak Signal-to-Noise Ratio) - đo chất lượng ảnh
+  - L1 Loss - đo sai số pixel-wise
+- **Quality Validation**: So sánh metrics với thresholds
+  - SSIM ≥ 0.3
+  - PSNR ≥ 10.0 dB
+- **Artifacts**: Upload metrics và sample images
+
+### 2️⃣ **CD - Continuous Deployment**
+
+#### a) Docker Build & Push
+- Build Docker image với model và dependencies
+- Push lên Docker Hub với tag `latest`
+- Chỉ chạy khi code được merge vào `main` branch
+
+#### b) Deployment (Manual/Auto)
+- Deploy container lên server/cloud
+- Health check và monitoring
+- Rollback nếu có lỗi
+
+### 🎯 Quality Gates
+
+Pipeline có các checkpoints để đảm bảo chất lượng:
+
+| Gate | Condition | Action if Failed |
+|------|-----------|-----------------|
+| Lint Check | Ruff pass | Block PR merge |
+| Unit Tests | All pass | Block PR merge |
+| Model Evaluation | Metrics > threshold | Block deployment |
+| Docker Build | Build success | Alert team |
+
+### 📊 Monitoring & Tracking
+
+- **MLflow**: Track experiments, parameters, metrics
+- **Weights & Biases**: Visualize training progress, compare runs
+- **Prometheus + Grafana**: Monitor infrastructure metrics
+- **GitHub Actions Artifacts**: Store evaluation results
 
 ### 📊 Kết quả (Results)
 ![Input Image](docs/docs/z7204701548610_15059adea9369f765cea5d54dd161d45.jpg)

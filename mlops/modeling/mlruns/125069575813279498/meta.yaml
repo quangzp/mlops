@@ -1,0 +1,6 @@
+artifact_location: file:///Users/manhnguyen/Project/mlops/mlops/modeling/mlruns/125069575813279498
+creation_time: 1767948593331
+experiment_id: '125069575813279498'
+last_update_time: 1767948593331
+lifecycle_stage: active
+name: pix2pixhd_baseline

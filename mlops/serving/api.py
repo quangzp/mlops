@@ -11,7 +11,7 @@ from mlops.src.components.generator import define_G
 app = FastAPI(
     title="Pix2PixHD Inference API",
     description="REST API for Pix2PixHD image-to-image translation",
-    version="1.0.0",
+    version="0.1.0",
 )
 
 # Load generator khi khởi động server

@@ -16,7 +16,14 @@ help:
 	@echo "  make features   - Run feature generation"
 	@echo "  make train      - Train model"
 	@echo "  make predict    - Run inference"
+	@echo "  make docs       - Serve documentation (MkDocs)"
+	@echo "  make docs-build - Build documentation static site"
 	@echo "  make clean      - Clean cache/build files"
+	@echo ""
+	@echo "Version Management:"
+	@echo "  make version           - Show current version"
+	@echo "  make version-sync     - Sync version across all files"
+	@echo "  make version-bump     - Bump version (use PART=major|minor|patch)"
 
 
 # -------- ENV SETUP --------
@@ -48,8 +55,43 @@ predict:
 	$(PYTHON) mlops/modeling/predict.py --config $(CONFIG_DIR)/predict.yaml
 
 
+# -------- DOCUMENTATION --------
+
+docs:
+	@echo "Starting MkDocs server..."
+	@echo "Documentation will be available at http://127.0.0.1:8000"
+	mkdocs serve
+
+docs-build:
+	@echo "Building documentation..."
+	mkdocs build
+	@echo "Documentation built in 'site/' directory"
+
+docs-install:
+	@echo "Installing MkDocs and dependencies..."
+	python3 -m pip install -r requirements-dev.txt
+
+
+# -------- VERSION MANAGEMENT --------
+
+version:
+	@python3 scripts/version.py show
+
+version-sync:
+	@python3 scripts/version.py sync
+
+version-bump:
+	@if [ -z "$(PART)" ]; then \
+		echo "Error: Please specify PART=major|minor|patch"; \
+		echo "Example: make version-bump PART=patch"; \
+		exit 1; \
+	fi
+	@python3 scripts/version.py bump $(PART)
+
+
 # -------- CLEAN --------
 
 clean:
 	rm -rf __pycache__ */__pycache__
 	find . -name "*.pyc" -delete
+	rm -rf site/  # Clean MkDocs build directory
