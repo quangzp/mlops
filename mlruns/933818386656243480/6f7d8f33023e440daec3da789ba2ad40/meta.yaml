@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlruns/933818386656243480/6f7d8f33023e440daec3da789ba2ad40/artifacts
+end_time: 1767984945948
+entry_point_name: ''
+experiment_id: '933818386656243480'
+lifecycle_stage: active
+run_id: 6f7d8f33023e440daec3da789ba2ad40
+run_name: peaceful-lamb-906
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767984451338
+status: 3
+tags: []
+user_id: manhnguyen

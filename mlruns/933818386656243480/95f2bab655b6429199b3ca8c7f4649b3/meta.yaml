@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlruns/933818386656243480/95f2bab655b6429199b3ca8c7f4649b3/artifacts
+end_time: 1767986304506
+entry_point_name: ''
+experiment_id: '933818386656243480'
+lifecycle_stage: active
+run_id: 95f2bab655b6429199b3ca8c7f4649b3
+run_name: dashing-elk-345
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767985481805
+status: 3
+tags: []
+user_id: manhnguyen

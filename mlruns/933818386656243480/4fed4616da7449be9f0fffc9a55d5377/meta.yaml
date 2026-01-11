@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlruns/933818386656243480/4fed4616da7449be9f0fffc9a55d5377/artifacts
+end_time: 1767989144906
+entry_point_name: ''
+experiment_id: '933818386656243480'
+lifecycle_stage: active
+run_id: 4fed4616da7449be9f0fffc9a55d5377
+run_name: learned-goat-343
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767987724799
+status: 3
+tags: []
+user_id: manhnguyen

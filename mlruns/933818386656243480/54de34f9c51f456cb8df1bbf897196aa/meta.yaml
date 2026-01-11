@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlruns/933818386656243480/54de34f9c51f456cb8df1bbf897196aa/artifacts
+end_time: 1768029155395
+entry_point_name: ''
+experiment_id: '933818386656243480'
+lifecycle_stage: active
+run_id: 54de34f9c51f456cb8df1bbf897196aa
+run_name: skittish-fox-721
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768028669645
+status: 3
+tags: []
+user_id: manhnguyen

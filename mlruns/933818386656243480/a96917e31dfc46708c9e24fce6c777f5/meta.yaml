@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/manhnguyen/Project/mlops/mlruns/933818386656243480/a96917e31dfc46708c9e24fce6c777f5/artifacts
+end_time: 1767983803633
+entry_point_name: ''
+experiment_id: '933818386656243480'
+lifecycle_stage: active
+run_id: a96917e31dfc46708c9e24fce6c777f5
+run_name: useful-grouse-961
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767983277852
+status: 3
+tags: []
+user_id: manhnguyen

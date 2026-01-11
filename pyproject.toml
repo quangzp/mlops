@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlops"
-version = "0.0.1"
+version = "0.1.0"
 description = "MLOps project for Sketch to Image"
 authors = [
   { name = "Manh Nguyen", email = "mashwoodev@gmail.com" },
